@@ -35,7 +35,7 @@ public class PoloniexClient
 					@Override
 					public void call(PubSubData tickerData)
 					{
-						System.out.println("ticker: " + tickerData.arguments().get(0));
+						System.out.println("ticker: " + tickerData.arguments());
 					}
 				};
 				tickerSubscription.subscribe(tickerAction, (e) -> {

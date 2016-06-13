@@ -50,7 +50,7 @@ public class PoloniexClient
 		@Override
 		public void call(PubSubData data)
 		{
-			TickerRecord record = new TickerRecord(data.arguments());
+			TickerRecord record = new TickerRecord(data);
 			System.out.println(record);
 		}
 	};

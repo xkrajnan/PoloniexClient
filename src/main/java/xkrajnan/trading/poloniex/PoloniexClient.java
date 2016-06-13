@@ -34,7 +34,8 @@ public class PoloniexClient
 			System.err.println("Status: " + status);
 
 			if (status instanceof ConnectedState) {
-				client.makeSubscription("ticker").subscribe(printTickerData);
+				// client.makeSubscription("ticker").subscribe(printTickerData);
+				client.makeSubscription("BTC_ETH").subscribe(printOrder);
 
 			} else if (status instanceof ConnectingState) {
 
@@ -52,6 +53,25 @@ public class PoloniexClient
 		{
 			TickerRecord record = new TickerRecord(data);
 			System.out.println(record);
+		}
+	};
+
+	private final Action1<PubSubData> printOrder = new Action1<PubSubData>() {
+		@Override
+		public void call(PubSubData data)
+		{
+			System.out.println(data.arguments());
+
+			try {
+				// TODO: this cannot work like this because there can be
+				// multiple simultaneous updates:
+				// [{"type":"orderBookRemove","data":{"type":"ask","rate":"0.02485989"}},{"type":"orderBookModify","data":{"type":"ask","rate":"0.02488640","amount":"241.65200000"}}]
+				OrderBookModify orderBookData = new OrderBookModify(data);
+				System.out.println(orderBookData);
+
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		}
 	};
 

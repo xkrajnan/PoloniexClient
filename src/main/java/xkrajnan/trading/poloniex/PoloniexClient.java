@@ -72,4 +72,9 @@ public class PoloniexClient
 		client.open();
 	}
 
+	public void close()
+	{
+		client.close().toBlocking().last();
+	}
+
 }

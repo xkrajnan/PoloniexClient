@@ -59,8 +59,12 @@ public class PoloniexClient
 		NettyWampClientConnectorProvider connectorProvider = new NettyWampClientConnectorProvider();
 
 		WampClientBuilder builder = new WampClientBuilder();
-		builder.withConnectorProvider(connectorProvider).withUri(POLONIEX_API_URL).withRealm(REALM)
-				.withInfiniteReconnects().withReconnectInterval(RECONNECT_INTERVAL_SEC, TimeUnit.SECONDS);
+
+		builder.withConnectorProvider(connectorProvider);
+		builder.withUri(POLONIEX_API_URL);
+		builder.withRealm(REALM);
+		builder.withInfiniteReconnects();
+		builder.withReconnectInterval(RECONNECT_INTERVAL_SEC, TimeUnit.SECONDS);
 
 		client = builder.build();
 

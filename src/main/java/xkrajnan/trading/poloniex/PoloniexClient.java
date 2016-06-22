@@ -23,7 +23,8 @@ public class PoloniexClient
 
 	private final WampClient client;
 
-	private final OrderBook orderBook;
+	private final OrderBook orderBookAsk;
+	private final OrderBook orderBookBid;
 
 	public PoloniexClient() throws Exception
 	{
@@ -38,9 +39,10 @@ public class PoloniexClient
 		builder.withReconnectInterval(RECONNECT_INTERVAL_SEC, TimeUnit.SECONDS);
 
 		client = builder.build();
-		orderBook = new OrderBook();
+		orderBookAsk = new OrderBook();
+		orderBookBid = new OrderBook();
 
-		client.statusChanged().subscribe(new ClientStatusChangedAction(client, orderBook));
+		client.statusChanged().subscribe(new ClientStatusChangedAction(client, orderBookAsk, orderBookBid));
 	}
 
 	public void open()

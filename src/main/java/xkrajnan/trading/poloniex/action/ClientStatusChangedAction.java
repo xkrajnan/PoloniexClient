@@ -8,16 +8,19 @@ import ws.wamp.jawampa.WampClient.DisconnectedState;
 import ws.wamp.jawampa.WampClient.State;
 import xkrajnan.trading.poloniex.currency.CurrencyPair;
 import xkrajnan.trading.poloniex.orderbook.OrderBook;
+import xkrajnan.trading.poloniex.orderbook.OrderType;
 
 public class ClientStatusChangedAction implements Action1<State>
 {
 	private final WampClient client;
-	private final OrderBook orderBook;
+	private final OrderBook orderBookAsk;
+	private final OrderBook orderBookBid;
 
-	public ClientStatusChangedAction(WampClient client, OrderBook orderBook)
+	public ClientStatusChangedAction(WampClient client, OrderBook orderBookAsk, OrderBook orderBookBid)
 	{
 		this.client = client;
-		this.orderBook = orderBook;
+		this.orderBookAsk = orderBookAsk;
+		this.orderBookBid = orderBookBid;
 	}
 
 	@Override
@@ -26,9 +29,7 @@ public class ClientStatusChangedAction implements Action1<State>
 		System.err.println("Status: " + status);
 
 		if (status instanceof ConnectedState) {
-			client.makeSubscription("ticker").subscribe(new PrintTickerDataAction());
-			client.makeSubscription(CurrencyPair.BTC_ETH.getCode())
-					.subscribe(new PrintOrderAction(orderBook));
+			subscribeUpdates();
 
 		} else if (status instanceof ConnectingState) {
 
@@ -37,5 +38,14 @@ public class ClientStatusChangedAction implements Action1<State>
 		} else {
 			System.err.println("Invalid client state!");
 		}
+	}
+
+	private void subscribeUpdates()
+	{
+		client.makeSubscription("ticker").subscribe(new PrintTickerDataAction());
+		client.makeSubscription(CurrencyPair.BTC_ETH.getCode())
+				.subscribe(new OrderBookUpdateAction(orderBookAsk, OrderType.ASK));
+		client.makeSubscription(CurrencyPair.BTC_ETH.getCode())
+				.subscribe(new OrderBookUpdateAction(orderBookBid, OrderType.BID));
 	}
 }

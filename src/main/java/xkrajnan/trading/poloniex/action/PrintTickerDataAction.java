@@ -13,7 +13,7 @@ public class PrintTickerDataAction implements Action1<PubSubData>
 			TickerRecord record = new TickerRecord(data);
 			System.out.println(record);
 		} catch (Exception e) {
-
+			System.err.println(e);
 		}
 	}
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import ws.wamp.jawampa.PubSubData;
+import xkrajnan.trading.poloniex.currency.CurrencyPair;
 
 /**
  * @author xkrajnan
@@ -18,7 +19,7 @@ public class TickerRecord
 		CURRENCY_PAIR, LAST, LOWEST_ASK, HIGHEST_BID, PERCENT_CHANGE, BASE_VOLUME, QUOTE_VOLUME, IS_FROZEN, HR24_HIGH, HR24_LOW
 	}
 
-	private final String currencyPair;
+	private final CurrencyPair currencyPair;
 
 	private final double last;
 	private final double lowestAsk;
@@ -35,7 +36,7 @@ public class TickerRecord
 		ArrayNode arguments = tickerData.arguments();
 
 		// there are no field names returned in data
-		this.currencyPair = getField(arguments, TickerField.CURRENCY_PAIR).asText();
+		this.currencyPair = CurrencyPair.valueOf(getField(arguments, TickerField.CURRENCY_PAIR).asText());
 		this.last = getField(arguments, TickerField.LAST).asDouble();
 		this.lowestAsk = getField(arguments, TickerField.LOWEST_ASK).asDouble();
 		this.highestBid = getField(arguments, TickerField.HIGHEST_BID).asDouble();
@@ -71,7 +72,7 @@ public class TickerRecord
 		return builder.toString();
 	}
 
-	public String getCurrencyPair()
+	public CurrencyPair getCurrencyPair()
 	{
 		return currencyPair;
 	}

@@ -29,7 +29,7 @@ public class ClientStatusChangedAction implements Action1<State>
 		System.err.println("Status: " + status);
 
 		if (status instanceof ConnectedState) {
-			subscribeUpdates();
+			subscribeForUpdates();
 
 		} else if (status instanceof ConnectingState) {
 
@@ -40,12 +40,13 @@ public class ClientStatusChangedAction implements Action1<State>
 		}
 	}
 
-	private void subscribeUpdates()
+	private void subscribeForUpdates()
 	{
 		client.makeSubscription("ticker").subscribe(new PrintTickerDataAction());
 		client.makeSubscription(CurrencyPair.BTC_ETH.getCode())
 				.subscribe(new OrderBookUpdateAction(orderBookAsk, OrderType.ASK));
 		client.makeSubscription(CurrencyPair.BTC_ETH.getCode())
 				.subscribe(new OrderBookUpdateAction(orderBookBid, OrderType.BID));
+		client.makeSubscription(CurrencyPair.BTC_ETH.getCode()).subscribe(new TradeHistoryUpdateAction());
 	}
 }

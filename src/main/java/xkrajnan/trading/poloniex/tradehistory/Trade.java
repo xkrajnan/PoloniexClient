@@ -13,10 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class Trade
 {
-	public static enum TradeType {
-		buy, sell
-	}
-
 	private final int id;
 	private final double price;
 	private final double amount;
@@ -34,13 +30,13 @@ public class Trade
 		this.date = date;
 	}
 
-	public Trade(JsonNode data)
+	public Trade(JsonNode node)
 	{
-		id = data.get("data").get("amount").asInt();
-		price = data.get("data").get("rate").asDouble();
-		amount = data.get("data").get("amount").asDouble();
-		total = data.get("data").get("total").asDouble();
-		type = TradeType.valueOf(data.get("data").get("type").asText());
+		id = node.get("tradeID").asInt();
+		price = node.get("rate").asDouble();
+		amount = node.get("amount").asDouble();
+		total = node.get("total").asDouble();
+		type = TradeType.valueOf(node.get("type").asText());
 		// date = new Date(data.get("data").get("date").asText());
 		date = null;
 	}
@@ -50,7 +46,7 @@ public class Trade
 	{
 		StringBuilder builder = new StringBuilder();
 
-		builder.append("new trade: ");
+		builder.append("trade: ");
 		builder.append("id=").append(id).append(", ");
 		builder.append("date=").append(date).append(", ");
 		builder.append("type=").append(type).append(", ");

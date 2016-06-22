@@ -5,6 +5,8 @@ package xkrajnan.trading.poloniex;
 
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import rx.functions.Action1;
 import ws.wamp.jawampa.PubSubData;
 import ws.wamp.jawampa.WampClient;
@@ -14,6 +16,9 @@ import ws.wamp.jawampa.WampClient.DisconnectedState;
 import ws.wamp.jawampa.WampClient.State;
 import ws.wamp.jawampa.WampClientBuilder;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
+import xkrajnan.trading.poloniex.orderbook.OrderBook;
+import xkrajnan.trading.poloniex.ticker.TickerRecord;
+import xkrajnan.trading.poloniex.tradehistory.Trade;
 
 /**
  * @author xkrajnan
@@ -26,6 +31,8 @@ public class PoloniexClient
 	private static final int RECONNECT_INTERVAL_SEC = 5;
 
 	private final WampClient client;
+
+	private final OrderBook orderBook;
 
 	private final Action1<State> logStatusChanged = new Action1<State>() {
 		@Override
@@ -60,14 +67,25 @@ public class PoloniexClient
 		@Override
 		public void call(PubSubData data)
 		{
-			System.out.println(data.arguments());
-
 			try {
-				// TODO: this cannot work like this because there can be
-				// multiple simultaneous updates:
-				// [{"type":"orderBookRemove","data":{"type":"ask","rate":"0.02485989"}},{"type":"orderBookModify","data":{"type":"ask","rate":"0.02488640","amount":"241.65200000"}}]
-				OrderBookModify orderBookData = new OrderBookModify(data);
-				System.out.println(orderBookData);
+				for (JsonNode node : data.arguments()) {
+					String type = node.get("type").asText();
+					if (type.equals(OrderBookModify.TYPE_ORDER_BOOK_MODIFY)) {
+						OrderBookModify orderBookData = new OrderBookModify(node);
+						System.out.println("modify " + orderBookData);
+						orderBook.put(orderBookData.getRate(), orderBookData.getAmount());
+					} else if (type.equals(OrderBookRemove.TYPE_ORDER_BOOK_REMOVE)) {
+						OrderBookRemove orderBookData = new OrderBookRemove(node);
+						System.out.println("remove " + orderBookData);
+						orderBook.remove(orderBookData.getRate());
+					} else {
+						Trade trade = new Trade(node);
+						System.out.println(trade);
+						System.out.println(orderBook);
+						System.out.println(orderBook.getMinPrice());
+						System.out.println(orderBook.getTotalVolume());
+					}
+				}
 
 			} catch (Exception e) {
 				System.out.println(e);
@@ -90,6 +108,8 @@ public class PoloniexClient
 		client = builder.build();
 
 		client.statusChanged().subscribe(logStatusChanged);
+
+		orderBook = new OrderBook();
 	}
 
 	public void open()

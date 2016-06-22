@@ -5,7 +5,8 @@ package xkrajnan.trading.poloniex;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import ws.wamp.jawampa.PubSubData;
+import xkrajnan.trading.poloniex.orderbook.Order;
+import xkrajnan.trading.poloniex.orderbook.Order.OrderType;
 
 /**
  * @author xkrajnan
@@ -14,25 +15,21 @@ import ws.wamp.jawampa.PubSubData;
 public class OrderBookRemove
 {
 
-	private static final String TYPE_ORDER_BOOK_REMOVE = "orderBookRemove";
+	public static final String TYPE_ORDER_BOOK_REMOVE = "orderBookRemove";
 
 	private final double rate;
+	private final Order.OrderType type;
 
-	public OrderBookRemove(PubSubData orderData)
+	public OrderBookRemove(JsonNode data)
 	{
-		JsonNode data = orderData.arguments().get(0);
-
-		if (!data.get("type").asText().equals(TYPE_ORDER_BOOK_REMOVE)) {
-			throw new IllegalArgumentException("Invalid data type: " + data.get("type").asText());
-		}
-
 		rate = data.get("data").get("rate").asDouble();
+		type = Order.OrderType.valueOf(data.get("data").get("type").asText());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "ask: rate=" + String.valueOf(rate);
+		return "ask: type= " + type + ", rate=" + String.valueOf(rate);
 	}
 
 	public double getRate()

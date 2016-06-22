@@ -1,7 +1,7 @@
 /**
  * 
  */
-package xkrajnan.trading.poloniex;
+package xkrajnan.trading.poloniex.ticker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
